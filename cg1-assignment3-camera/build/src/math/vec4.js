@@ -106,7 +106,7 @@ class Vec4 {
         const x = this.y * v.z - this.z * v.y;
         const y = this.z * v.x - this.x * v.z;
         const z = this.x * v.y - this.y * v.x;
-        return new Vec4(x, y, z, 0);
+        return new Vec4(x, y, z, 1);
     }
     /**
      * len computes the length of the given Vector. Note that this method

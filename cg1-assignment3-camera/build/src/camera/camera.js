@@ -35,20 +35,23 @@ class Camera {
      */
     // prettier-ignore
     viewMatrix() {
+        // TODO
         const translation = new mat4_1.Mat4([
             1, 0, 0, -this.position.x,
             0, 1, 0, -this.position.y,
             0, 0, 1, -this.position.z,
             0, 0, 0, 1
         ]);
-        const lookAtCrossUp = this.lookAt.cross(this.up);
+        const xcross = this.up.y * this.lookAt.z - this.up.z * this.lookAt.y;
+        const ycross = this.up.z * this.lookAt.x - this.up.x * this.lookAt.z;
+        const zcross = this.up.x * this.lookAt.y - this.up.y * this.lookAt.x;
+        //const helper = this.lookAt.cross(this.up);
         const rotation = new mat4_1.Mat4([
-            lookAtCrossUp.x, lookAtCrossUp.y, lookAtCrossUp.z, 0,
+            xcross, ycross, zcross, 0,
             this.up.x, this.up.y, this.up.z, 0,
             0, 0, -1, 0,
             0, 0, 0, 1
         ]);
-        //Tr*Tt
         return translation.mulM(rotation);
     }
     projMatrix() {
@@ -75,7 +78,12 @@ class PerspectiveCamera extends Camera {
     // prettier-ignore
     projMatrix() {
         // TODO: implement perspective projection transformation (Tpersp)
-        return new mat4_1.Mat4([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        return new mat4_1.Mat4([
+            -(1 / (this.aspect * Math.tan(this.fov / 2))), 0, 0, 0,
+            0, -(1 / (Math.tan(this.fov / 2))), 0, 0,
+            0, 0, (this.near + this.far) / (this.near - this.far), 0,
+            0, 0, 1, 0
+        ]);
     }
 }
 exports.PerspectiveCamera = PerspectiveCamera;
@@ -99,8 +107,12 @@ class OrthographicCamera extends Camera {
      */
     // prettier-ignore
     projMatrix() {
-        // TODO: implement orthographic projection transformation (Tortho)
-        return new mat4_1.Mat4([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        return new mat4_1.Mat4([
+            2 / (this.right - this.left), 0, 0, (this.left + this.right) / (this.left - this.right),
+            0, 2 / (this.top - this.bottom), 0, (this.bottom + this.top) / (this.bottom - this.top),
+            0, 0, 2 / (this.near - this.far), (this.far + this.near) / (this.far - this.near),
+            0, 0, 0, 1
+        ]);
     }
 }
 exports.OrthographicCamera = OrthographicCamera;
@@ -113,7 +125,12 @@ exports.OrthographicCamera = OrthographicCamera;
 // prettier-ignore
 function viewportMatrix(width, height) {
     // TODO: implement viewport transformation (Tviewport)
-    return new mat4_1.Mat4([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    return new mat4_1.Mat4([
+        width / 2, 0, 0, width / 2,
+        0, height / 2, 0, height / 2,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ]);
 }
 exports.viewportMatrix = viewportMatrix;
 //# sourceMappingURL=camera.js.map

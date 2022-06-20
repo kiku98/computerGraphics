@@ -64,11 +64,12 @@ export class Camera {
     const rotation = new Mat4([
       xcross, ycross, zcross, 0,
       this.up.x, this.up.y, this.up.z, 0,
-      0,0,-1,0,
+      -this.lookAt.x, -this.lookAt.y, -this.lookAt.z ,0,
       0,0,0,1
     ])
     return translation.mulM(rotation);
   }
+
   projMatrix(): Mat4 {
     throw new Error('unsupported when camera type is not specified!');
   }
@@ -106,11 +107,11 @@ export class PerspectiveCamera extends Camera {
   // prettier-ignore
   projMatrix(): Mat4 {
     // TODO: implement perspective projection transformation (Tpersp)
-    return this.viewMatrix().mulM(new Mat4([
+    return new Mat4([
       -(1/(this.aspect*Math.tan(this.fov/2))), 0, 0, 0,
       0, -(1/(Math.tan(this.fov/2))), 0, 0,
       0, 0, (this.near+this.far)/(this.near-this.far), 0,
-      0, 0, 1, 0] ))
+      0, 0, 1, 0] )
   }
 }
 
@@ -151,12 +152,12 @@ export class OrthographicCamera extends Camera {
    */
   // prettier-ignore
   projMatrix(): Mat4 {  
-    return this.viewMatrix().mulM(new Mat4([
+    return new Mat4([
       2/(this.right-this.left), 0, 0, (this.left+this.right)/(this.left-this.right),
       0, 2/(this.top-this.bottom), 0, (this.bottom+this.top)/(this.bottom-this.top),
       0, 0, 2/(this.near-this.far), (this.far+this.near)/(this.far-this.near),
       0, 0, 0, 1
-    ]))
+    ])
   }
 }
 

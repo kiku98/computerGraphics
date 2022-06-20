@@ -9,6 +9,7 @@
 import {Mat4} from '../math/mat4';
 import {Vec4} from '../math/vec4';
 import {Quaternion} from '../math/quaternion';
+import THREE from 'three';
 
 /**
  * Object3D implements the abstraction for a transformable object.
