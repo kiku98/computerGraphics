@@ -12,6 +12,7 @@ import {Vert} from '../geometry/mesh';
 import {Mat4} from '../math/mat4';
 import {Vec4} from '../math/vec4';
 import {Scene} from './scene';
+import { Triangle, Vector3 } from 'three';
 
 /**
  * Rasterizer is a software rasterizer.
@@ -44,7 +45,7 @@ export class Rasterizer {
    * @returns a frame buffer that stores a black color in all pixels.
    */
   initFrameBuffer(): Array<Vec4> {
-    // TODO: creates and returns a frame buffer that is initialized using
+    // DONE: creates and returns a frame buffer that is initialized using
     // black color (0, 0, 0, 1) for R, G, B, A four channels.
     const vecArray = new Array<Vec4>(this.width*this.height);
     for (let index = 0; index < this.width*this.height; index++) {
@@ -140,7 +141,18 @@ export class Rasterizer {
     // One can use the UV and normal directly from input vertex without
     // applying any transformations. To access elements in a Map, one
     // can use .get() method.
-    return new Vert(new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0));
+    //console.log(uniforms)
+    const projMatrix = uniforms.get("projMatrix") as Mat4;
+    const modelMatrix = uniforms.get("modelMatrix") as Mat4;
+    const viewMatrix = uniforms.get("viewMatrix") as Mat4;
+    //const vpMatrix = uniforms.get("vpMatrix") as Mat4;
+    
+    //   mat4 MV = V * M;
+    // mat4 MVP = P * MV;
+    // vec4 v1 = MVP * v;
+    const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new Vec4(v.position.x, v.position.y, v.position.z, 1)) 
+    
+    return new Vert(gl_Position, v.normal, v.uv);
   }
 
   /**
@@ -156,6 +168,18 @@ export class Rasterizer {
   isBackFace(v1: Vec4, v2: Vec4, v3: Vec4): boolean {
     // TODO: check whether the triangle of three given vertices is a
     // backface or not.
+    // Backface culling can be easily implemented by calculating the dot product*
+    // of face normal and camera look at direction.assumed to be unit vectors
+    const u = v2.sub(v1)
+    const v = v3.sub(v1)
+    // Nx = UyVz - UzVy
+    // Ny = UzVx - UxVz
+    // Nz = UxVy - UyVx
+    
+    const nx = u.y*v.z - u.z*v.y
+    const ny = u.z*v.x - u.x*v.z
+    const nz = u.x*v.y - u.y*v.x
+    const normal = new Vec4(nx, ny, nz, 1)
     return false
   }
 
@@ -175,6 +199,8 @@ export class Rasterizer {
     //
     // Hint: one can test if the AABB of the given triangle intersects
     // with the AABB of the viewport space.
+    const aabbVector = new AABB(v1,v2,v3)
+    const aabbViewport = new AABB(v1,v2,v3)
     return false;
   }
 
@@ -222,12 +248,42 @@ export class Rasterizer {
    * @returns true if p is inside triangle v1v2v3
    */
   isInsideTriangle(p: Vec4, v1: Vec4, v2: Vec4, v3: Vec4): boolean {
-    // TODO: implement point in triangle assertion, returns true if the given
+    // DONE: implement point in triangle assertion, returns true if the given
     // point is inside the given triangle (three vertices), or false otherwise.
     //
     // If the given point is on the edge of the given triangle, it is considered
     // as inside of the triangle in this implementation.
-    return false;
+    // const triangle = new Triangle(new Vector3(v1.x, v1.y, v1.z), new Vector3(v2.x, v2.y, v2.z),new Vector3(v3.x, v3.x, v3.z))
+    // triangle.containsPoint(new Vector3(p.x, p.y, p.z))
+
+    function sameSide(p1:Vec4, p2:Vec4, a:Vec4, b: Vec4): boolean{
+      const cp1 = (b.sub(a)).cross(p1.sub(a))
+      const cp2 = (b.sub(a)).cross(p2.sub(a))
+      if (cp1.dot(cp2)>=0) {
+        return true
+      }
+      else{
+        return false
+      }
+    }
+    if (sameSide(p, v1, v2, v3) && sameSide(p,v2,v1,v3) && sameSide(p,v3,v1,v2)){
+      return true
+    }
+    else{
+      return false
+    }
+
+    //     function SameSide(p1,p2, a,b)
+    //     cp1 = CrossProduct(b-a, p1-a)
+    //     cp2 = CrossProduct(b-a, p2-a)
+    //     if DotProduct(cp1, cp2) >= 0 then return true
+    //     else return false
+
+    // function PointInTriangle(p, a,b,c)
+    //     if SameSide(p,a, b,c) and SameSide(p,b, a,c)
+    //         and SameSide(p,c, a,b) then return true
+    //     else return false
+   
   }
   /**
    * drawPixel draws a pixel by its given position (x, y), the drawing
