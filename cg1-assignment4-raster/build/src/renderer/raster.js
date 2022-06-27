@@ -279,13 +279,6 @@ class Rasterizer {
         // this.height = row = j
         // this.width = column = i
         if (i <= this.width && i >= 0 && j <= this.height && j >= 0) {
-            // let totalIndex = 0;
-            // for (let index = 0; index < j; index++) {
-            //   totalIndex=totalIndex+1;
-            //   for (let indexj = 0; indexj < i; indexj++) {
-            //     totalIndex=totalIndex+1;
-            //   }
-            // }
             const totalIndex = (this.width * j) + i;
             buf[totalIndex] = value;
         }
