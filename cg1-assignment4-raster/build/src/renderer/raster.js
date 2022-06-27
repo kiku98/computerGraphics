@@ -38,9 +38,9 @@ class Rasterizer {
      * @returns a frame buffer that stores a black color in all pixels.
      */
     initFrameBuffer() {
-        // TODO: creates and returns a frame buffer that is initialized using
+        // DONE: creates and returns a frame buffer that is initialized using
         // black color (0, 0, 0, 1) for R, G, B, A four channels.
-        const vecArray = new Array(this.width * this.height);
+        const vecArray = new Array();
         for (let index = 0; index < this.width * this.height; index++) {
             vecArray.push(new vec4_1.Vec4(0, 0, 0, 1));
         }
@@ -122,7 +122,16 @@ class Rasterizer {
         // One can use the UV and normal directly from input vertex without
         // applying any transformations. To access elements in a Map, one
         // can use .get() method.
-        return new mesh_1.Vert(new vec4_1.Vec4(0, 0, 0, 0), new vec4_1.Vec4(0, 0, 0, 0), new vec4_1.Vec4(0, 0, 0, 0));
+        //console.log(uniforms)
+        const projMatrix = uniforms.get("projMatrix");
+        const modelMatrix = uniforms.get("modelMatrix");
+        const viewMatrix = uniforms.get("viewMatrix");
+        //const vpMatrix = uniforms.get("vpMatrix") as Mat4;
+        //   mat4 MV = V * M;
+        // mat4 MVP = P * MV;
+        // vec4 v1 = MVP * v;
+        const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new vec4_1.Vec4(v.position.x, v.position.y, v.position.z, 1));
+        return new mesh_1.Vert(gl_Position, v.normal, v.uv);
     }
     /**
      * isBackFace checks if a given triangle is a back face or not. If the
@@ -137,6 +146,17 @@ class Rasterizer {
     isBackFace(v1, v2, v3) {
         // TODO: check whether the triangle of three given vertices is a
         // backface or not.
+        // Backface culling can be easily implemented by calculating the dot product*
+        // of face normal and camera look at direction.assumed to be unit vectors
+        const u = v2.sub(v1);
+        const v = v3.sub(v1);
+        // Nx = UyVz - UzVy
+        // Ny = UzVx - UxVz
+        // Nz = UxVy - UyVx
+        const nx = u.y * v.z - u.z * v.y;
+        const ny = u.z * v.x - u.x * v.z;
+        const nz = u.x * v.y - u.y * v.x;
+        const normal = new vec4_1.Vec4(nx, ny, nz, 1);
         return false;
     }
     /**
@@ -155,6 +175,9 @@ class Rasterizer {
         //
         // Hint: one can test if the AABB of the given triangle intersects
         // with the AABB of the viewport space.
+        const viewportMatrix = this.viewportMatrix();
+        const aabbVector = new aabb_1.AABB(v1, v2, v3);
+        const aabbViewport = new aabb_1.AABB(v1, v2, v3);
         return false;
     }
     /**
@@ -192,12 +215,38 @@ class Rasterizer {
      * @returns true if p is inside triangle v1v2v3
      */
     isInsideTriangle(p, v1, v2, v3) {
-        // TODO: implement point in triangle assertion, returns true if the given
+        // DONE: implement point in triangle assertion, returns true if the given
         // point is inside the given triangle (three vertices), or false otherwise.
         //
         // If the given point is on the edge of the given triangle, it is considered
         // as inside of the triangle in this implementation.
-        return false;
+        // const triangle = new Triangle(new Vector3(v1.x, v1.y, v1.z), new Vector3(v2.x, v2.y, v2.z),new Vector3(v3.x, v3.x, v3.z))
+        // triangle.containsPoint(new Vector3(p.x, p.y, p.z))
+        function sameSide(p1, p2, a, b) {
+            const cp1 = (b.sub(a)).cross(p1.sub(a));
+            const cp2 = (b.sub(a)).cross(p2.sub(a));
+            if (cp1.dot(cp2) >= 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        if (sameSide(p, v1, v2, v3) && sameSide(p, v2, v1, v3) && sameSide(p, v3, v1, v2)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+        //     function SameSide(p1,p2, a,b)
+        //     cp1 = CrossProduct(b-a, p1-a)
+        //     cp2 = CrossProduct(b-a, p2-a)
+        //     if DotProduct(cp1, cp2) >= 0 then return true
+        //     else return false
+        // function PointInTriangle(p, a,b,c)
+        //     if SameSide(p,a, b,c) and SameSide(p,b, a,c)
+        //         and SameSide(p,c, a,b) then return true
+        //     else return false
     }
     /**
      * drawPixel draws a pixel by its given position (x, y), the drawing
@@ -227,6 +276,19 @@ class Rasterizer {
         // in the given buffer by the given value. Any invalid inputs (such
         // as updating index outside the buffer range) should be discarded
         // directly without bothring the buffer.
+        // this.height = row = j
+        // this.width = column = i
+        if (i <= this.width && i >= 0 && j <= this.height && j >= 0) {
+            // let totalIndex = 0;
+            // for (let index = 0; index < j; index++) {
+            //   totalIndex=totalIndex+1;
+            //   for (let indexj = 0; indexj < i; indexj++) {
+            //     totalIndex=totalIndex+1;
+            //   }
+            // }
+            const totalIndex = (this.width * j) + i;
+            buf[totalIndex] = value;
+        }
     }
 }
 exports.Rasterizer = Rasterizer;

@@ -24,7 +24,7 @@ export class AABB {
    * @param v3 is a point position
    */
   constructor(v1: Vec4, v2: Vec4, v3: Vec4) {
-    // TODO: computes the minimum AABB of the given triangle, and
+    // DONE: computes the minimum AABB of the given triangle, and
     // stores the minimum and maximum corner of the bounding box in
     // this.min and this.max
     function largest(arr: Array<number>) {
@@ -69,7 +69,7 @@ export class AABB {
     this.max = new Vec4(x_max, y_max, z_max, 1);
 
   }
-  /**
+  /** DONE
    * intersect checks if the two given AABBs share an intersection.
    * If the two AABBs only share a single vertex or a 2D plane, then
    * it is also considered as an intersection and returns true.

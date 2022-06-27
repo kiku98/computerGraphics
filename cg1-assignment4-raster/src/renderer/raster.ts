@@ -12,7 +12,7 @@ import {Vert} from '../geometry/mesh';
 import {Mat4} from '../math/mat4';
 import {Vec4} from '../math/vec4';
 import {Scene} from './scene';
-import { Triangle, Vector3 } from 'three';
+import { threadId } from 'worker_threads';
 
 /**
  * Rasterizer is a software rasterizer.
@@ -47,7 +47,7 @@ export class Rasterizer {
   initFrameBuffer(): Array<Vec4> {
     // DONE: creates and returns a frame buffer that is initialized using
     // black color (0, 0, 0, 1) for R, G, B, A four channels.
-    const vecArray = new Array<Vec4>(this.width*this.height);
+    const vecArray = new Array<Vec4>();
     for (let index = 0; index < this.width*this.height; index++) {
       vecArray.push(new Vec4(0,0,0,1))
     }
@@ -199,6 +199,8 @@ export class Rasterizer {
     //
     // Hint: one can test if the AABB of the given triangle intersects
     // with the AABB of the viewport space.
+    const viewportMatrix = this.viewportMatrix();
+
     const aabbVector = new AABB(v1,v2,v3)
     const aabbViewport = new AABB(v1,v2,v3)
     return false;
@@ -313,5 +315,12 @@ export class Rasterizer {
     // in the given buffer by the given value. Any invalid inputs (such
     // as updating index outside the buffer range) should be discarded
     // directly without bothring the buffer.
+    // this.height = row = j
+    // this.width = column = i
+    if (i<=this.width&&i>=0&&j<=this.height&&j>=0) {
+      const totalIndex = (this.width*j)+i
+      buf[totalIndex]=value
+    }
+    
   }
 }

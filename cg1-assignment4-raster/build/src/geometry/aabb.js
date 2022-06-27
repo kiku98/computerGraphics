@@ -22,7 +22,7 @@ class AABB {
      * @param v3 is a point position
      */
     constructor(v1, v2, v3) {
-        // TODO: computes the minimum AABB of the given triangle, and
+        // DONE: computes the minimum AABB of the given triangle, and
         // stores the minimum and maximum corner of the bounding box in
         // this.min and this.max
         function largest(arr) {
@@ -60,7 +60,7 @@ class AABB {
         this.min = new vec4_1.Vec4(x_min, y_min, z_min, 1);
         this.max = new vec4_1.Vec4(x_max, y_max, z_max, 1);
     }
-    /**
+    /** DONE
      * intersect checks if the two given AABBs share an intersection.
      * If the two AABBs only share a single vertex or a 2D plane, then
      * it is also considered as an intersection and returns true.
@@ -69,8 +69,6 @@ class AABB {
      * @returns true if the given two aabb share an intersection, false otherwise.
      */
     intersect(aabb) {
-        //     if (b1.left > b2.rgt || b2.lft > b1.rgt || b1.top > b2.btm || b2.top > b1.btm)
-        // { <b1 und b2 kollidieren nicht> }
         return (this.min.x <= aabb.max.x && this.max.x >= aabb.min.x) &&
             (this.min.y <= aabb.max.y && this.max.y >= aabb.min.y) &&
             (this.min.z <= aabb.max.z && this.max.z >= this.min.z);
