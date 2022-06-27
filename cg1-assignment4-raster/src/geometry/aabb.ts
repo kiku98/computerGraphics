@@ -27,8 +27,47 @@ export class AABB {
     // TODO: computes the minimum AABB of the given triangle, and
     // stores the minimum and maximum corner of the bounding box in
     // this.min and this.max
-    this.min = new Vec4(0, 0, 0, 0);
-    this.max = new Vec4(0, 0, 0, 0);
+    function largest(arr: Array<number>) {
+      let i;
+     
+      // Initialize maximum element
+      let max = arr[0];
+ 
+      // Traverse array elements 
+      // from second and compare
+      // every element with current max 
+      for (i = 1; i < arr.length; i++) {
+          if (arr[i] > max)
+              max = arr[i];
+      }
+       
+    return max;
+    }
+    function min(arr: Array<number>) {
+      let i;
+     
+      // Initialize minimum element
+      let min = arr[0];
+ 
+      // Traverse array elements 
+      // from second and compare
+      // every element with current max 
+      for (i = 1; i < arr.length; i++) {
+          if (arr[i] < min)
+              min = arr[i];
+      }
+       
+    return min;
+    }
+    const x_max = largest([v1.x, v2.x, v3.x])
+    const x_min = min ([v1.x, v2.x, v3.x])
+    const y_max = largest([v1.y, v2.y, v3.y])
+    const y_min = min ([v1.y, v2.y, v3.y])
+    const z_max = largest([v1.z, v2.z, v3.z])
+    const z_min = min ([v1.z, v2.z, v3.z])
+    this.min = new Vec4(x_min, y_min, z_min, 1);
+    this.max = new Vec4(x_max, y_max, z_max, 1);
+
   }
   /**
    * intersect checks if the two given AABBs share an intersection.
@@ -39,7 +78,8 @@ export class AABB {
    * @returns true if the given two aabb share an intersection, false otherwise.
    */
   intersect(aabb: AABB): boolean {
-    // TODO: check if given two AABBs share an intersection.
-    return false;
+  return (this.min.x <= aabb.max.x && this.max.x >= aabb.min.x) &&
+    (this.min.y <= aabb.max.y && this.max.y >= aabb.min.y) &&
+    (this.min.z <= aabb.max.z && this.max.z >= this.min.z);
   }
 }

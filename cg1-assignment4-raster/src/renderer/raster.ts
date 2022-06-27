@@ -46,7 +46,11 @@ export class Rasterizer {
   initFrameBuffer(): Array<Vec4> {
     // TODO: creates and returns a frame buffer that is initialized using
     // black color (0, 0, 0, 1) for R, G, B, A four channels.
-    return new Array<Vec4>(0);
+    const vecArray = new Array<Vec4>(this.width*this.height);
+    for (let index = 0; index < this.width*this.height; index++) {
+      vecArray.push(new Vec4(0,0,0,1))
+    }
+    return vecArray;
   }
   /**
    * viewportMatrix returns the viewport matrix of the given rasterizer.
