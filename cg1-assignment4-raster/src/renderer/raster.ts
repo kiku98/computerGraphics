@@ -317,7 +317,7 @@ export class Rasterizer {
     // directly without bothring the buffer.
     // this.height = row = j
     // this.width = column = i
-    if (i<=this.width&&i>=0&&j<=this.height&&j>=0) {
+    if (i<this.width&&i>=0&&j<this.height&&j>=0) {
       const totalIndex = (this.width*j)+i
       buf[totalIndex]=value
     }
