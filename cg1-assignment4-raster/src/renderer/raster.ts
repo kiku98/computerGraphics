@@ -153,6 +153,7 @@ export class Rasterizer {
     const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new Vec4(v.position.x, v.position.y, v.position.z, 1)) 
     
     return new Vert(gl_Position, v.normal, v.uv);
+    //return new Vert(new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0));
   }
 
   /**
@@ -165,21 +166,28 @@ export class Rasterizer {
    * @param v3 is a given vertex position
    * @returns whether the given triangle is a back face or not.
    */
+  // Camera?? -> where is it called -> after vertexprocessing: It is a constant direction
   isBackFace(v1: Vec4, v2: Vec4, v3: Vec4): boolean {
     // TODO: check whether the triangle of three given vertices is a
     // backface or not.
     // Backface culling can be easily implemented by calculating the dot product*
     // of face normal and camera look at direction.assumed to be unit vectors
+
+    // calculate the 2 vectors
     const u = v2.sub(v1)
     const v = v3.sub(v1)
-    // Nx = UyVz - UzVy
-    // Ny = UzVx - UxVz
-    // Nz = UxVy - UyVx
     
-    const nx = u.y*v.z - u.z*v.y
-    const ny = u.z*v.x - u.x*v.z
-    const nz = u.x*v.y - u.y*v.x
-    const normal = new Vec4(nx, ny, nz, 1)
+    const normalVector = u.cross(v).unit()
+
+    // assuming looking at -z
+    const lookAtDirection = new Vec4(0,0,-1,0)
+    
+    // calc dot product of normal, lookAt
+    const dotProd = normalVector.dot(lookAtDirection)
+
+    if (dotProd>=0) {
+      return true
+    }
     return false
   }
 
@@ -199,10 +207,11 @@ export class Rasterizer {
     //
     // Hint: one can test if the AABB of the given triangle intersects
     // with the AABB of the viewport space.
-    const viewportMatrix = this.viewportMatrix();
-
     const aabbVector = new AABB(v1,v2,v3)
-    const aabbViewport = new AABB(v1,v2,v3)
+    const aabbViewport = new AABB(new Vec4(this.width,this.height,0,1),new Vec4(0,0,0,1),new Vec4(0,0,0,1))
+    if(aabbVector.intersect(aabbViewport)){
+      return true;
+    }
     return false;
   }
 
@@ -275,17 +284,6 @@ export class Rasterizer {
       return false
     }
 
-    //     function SameSide(p1,p2, a,b)
-    //     cp1 = CrossProduct(b-a, p1-a)
-    //     cp2 = CrossProduct(b-a, p2-a)
-    //     if DotProduct(cp1, cp2) >= 0 then return true
-    //     else return false
-
-    // function PointInTriangle(p, a,b,c)
-    //     if SameSide(p,a, b,c) and SameSide(p,b, a,c)
-    //         and SameSide(p,c, a,b) then return true
-    //     else return false
-   
   }
   /**
    * drawPixel draws a pixel by its given position (x, y), the drawing

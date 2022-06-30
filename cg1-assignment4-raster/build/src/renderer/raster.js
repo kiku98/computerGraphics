@@ -115,6 +115,7 @@ class Rasterizer {
      * @param uniforms is the uniform values that are equal among all vertices
      * @returns a vertex
      */
+    //
     vertexShader(v, uniforms) {
         // TODO: implement a minimum vertex shader that transform the given
         // vertex from model space to screen space.
@@ -143,6 +144,7 @@ class Rasterizer {
      * @param v3 is a given vertex position
      * @returns whether the given triangle is a back face or not.
      */
+    // Camera?? -> where is it called -> after vertexprocessing: It is a constant direction
     isBackFace(v1, v2, v3) {
         // TODO: check whether the triangle of three given vertices is a
         // backface or not.
@@ -238,15 +240,6 @@ class Rasterizer {
         else {
             return false;
         }
-        //     function SameSide(p1,p2, a,b)
-        //     cp1 = CrossProduct(b-a, p1-a)
-        //     cp2 = CrossProduct(b-a, p2-a)
-        //     if DotProduct(cp1, cp2) >= 0 then return true
-        //     else return false
-        // function PointInTriangle(p, a,b,c)
-        //     if SameSide(p,a, b,c) and SameSide(p,b, a,c)
-        //         and SameSide(p,c, a,b) then return true
-        //     else return false
     }
     /**
      * drawPixel draws a pixel by its given position (x, y), the drawing

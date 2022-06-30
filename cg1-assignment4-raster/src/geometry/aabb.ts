@@ -80,6 +80,6 @@ export class AABB {
   intersect(aabb: AABB): boolean {
   return (this.min.x <= aabb.max.x && this.max.x >= aabb.min.x) &&
     (this.min.y <= aabb.max.y && this.max.y >= aabb.min.y) &&
-    (this.min.z <= aabb.max.z && this.max.z >= this.min.z);
+    (this.min.z <= aabb.max.z && this.max.z >= aabb.min.z);
   }
 }
