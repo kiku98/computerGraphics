@@ -82,7 +82,7 @@ class Object3D {
         // Hint: use Quaternion, and use toRoMat() to convert a Quaternion to matrix.
         const s = Math.sin(angle / 2);
         const rotationPositive = new quaternion_1.Quaternion(Math.cos(angle / 2), dir.x * s, dir.y * s, dir.z * s);
-        this.context = rotationPositive.mul(rotationPositive).toRoMat();
+        this.context = rotationPositive.toRoMat().mulM(this.context);
     }
 }
 exports.Object3D = Object3D;
