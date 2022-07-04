@@ -135,7 +135,7 @@ export class Rasterizer {
    * @returns a vertex
    */
   vertexShader(v: Vert, uniforms: Map<string, Mat4>): Vert {
-    // TODO: implement a minimum vertex shader that transform the given
+    // DONE: implement a minimum vertex shader that transform the given
     // vertex from model space to screen space.
     //
     // One can use the UV and normal directly from input vertex without
@@ -145,15 +145,24 @@ export class Rasterizer {
     const projMatrix = uniforms.get("projMatrix") as Mat4;
     const modelMatrix = uniforms.get("modelMatrix") as Mat4;
     const viewMatrix = uniforms.get("viewMatrix") as Mat4;
-    //const vpMatrix = uniforms.get("vpMatrix") as Mat4;
-    
-    //   mat4 MV = V * M;
+    const vpMatrix = uniforms.get("vpMatrix") as Mat4;
+
+    let transformationMatrix = modelMatrix
+    transformationMatrix.mulM(viewMatrix)
+    transformationMatrix.mulM(projMatrix)
+    transformationMatrix.mulM(vpMatrix)
+
+    // mat4 MV = V * M;
     // mat4 MVP = P * MV;
     // vec4 v1 = MVP * v;
-    const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new Vec4(v.position.x, v.position.y, v.position.z, 1)) 
+
+    //let modelViewMatrix = viewMatrix.mulM(modelMatrix)
     
-    return new Vert(gl_Position, v.normal, v.uv);
-    //return new Vert(new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0));
+
+    // const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new Vec4(v.position.x, v.position.y, v.position.z, 1)) 
+    
+    return new Vert(v.position.apply(transformationMatrix), v.normal, v.uv);
+    // return new Vert(new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0));
   }
 
   /**
@@ -168,7 +177,7 @@ export class Rasterizer {
    */
   // Camera?? -> where is it called -> after vertexprocessing: It is a constant direction
   isBackFace(v1: Vec4, v2: Vec4, v3: Vec4): boolean {
-    // TODO: check whether the triangle of three given vertices is a
+    // DONE: check whether the triangle of three given vertices is a
     // backface or not.
     // Backface culling can be easily implemented by calculating the dot product*
     // of face normal and camera look at direction.assumed to be unit vectors
@@ -202,13 +211,16 @@ export class Rasterizer {
    * otherwise.
    */
   isInViewport(v1: Vec4, v2: Vec4, v3: Vec4): boolean {
-    // TODO: implement view frustum culling assertion, test if a given
+    // DONE: implement view frustum culling assertion, test if a given
     // triangle is inside the screen space [0, width] x [0, height] or not.
     //
     // Hint: one can test if the AABB of the given triangle intersects
     // with the AABB of the viewport space.
+
+    // return true;
+
     const aabbVector = new AABB(v1,v2,v3)
-    const aabbViewport = new AABB(new Vec4(this.width,this.height,0,1),new Vec4(0,0,0,1),new Vec4(0,0,0,1))
+    const aabbViewport = new AABB(new Vec4(0,0,0,1), new Vec4(this.width,this.height,0,1), new Vec4(0,0,0,1))
     if(aabbVector.intersect(aabbViewport)){
       return true;
     }
@@ -309,7 +321,7 @@ export class Rasterizer {
    * @param value is the new value to be stored in the buffer.
    */
   updateBuffer<Type>(buf: Array<Type>, i: number, j: number, value: Type) {
-    // TODO: implement the buffer update, update the corresponding values
+    // DONE: implement the buffer update, update the corresponding values
     // in the given buffer by the given value. Any invalid inputs (such
     // as updating index outside the buffer range) should be discarded
     // directly without bothring the buffer.

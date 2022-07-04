@@ -115,9 +115,8 @@ class Rasterizer {
      * @param uniforms is the uniform values that are equal among all vertices
      * @returns a vertex
      */
-    //
     vertexShader(v, uniforms) {
-        // TODO: implement a minimum vertex shader that transform the given
+        // DONE: implement a minimum vertex shader that transform the given
         // vertex from model space to screen space.
         //
         // One can use the UV and normal directly from input vertex without
@@ -127,12 +126,18 @@ class Rasterizer {
         const projMatrix = uniforms.get("projMatrix");
         const modelMatrix = uniforms.get("modelMatrix");
         const viewMatrix = uniforms.get("viewMatrix");
-        //const vpMatrix = uniforms.get("vpMatrix") as Mat4;
-        //   mat4 MV = V * M;
+        const vpMatrix = uniforms.get("vpMatrix");
+        let transformationMatrix = modelMatrix;
+        transformationMatrix.mulM(viewMatrix);
+        transformationMatrix.mulM(projMatrix);
+        transformationMatrix.mulM(vpMatrix);
+        // mat4 MV = V * M;
         // mat4 MVP = P * MV;
         // vec4 v1 = MVP * v;
-        const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new vec4_1.Vec4(v.position.x, v.position.y, v.position.z, 1));
-        return new mesh_1.Vert(gl_Position, v.normal, v.uv);
+        //let modelViewMatrix = viewMatrix.mulM(modelMatrix)
+        // const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new Vec4(v.position.x, v.position.y, v.position.z, 1)) 
+        return new mesh_1.Vert(v.position.apply(transformationMatrix), v.normal, v.uv);
+        // return new Vert(new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0));
     }
     /**
      * isBackFace checks if a given triangle is a back face or not. If the
@@ -146,19 +151,21 @@ class Rasterizer {
      */
     // Camera?? -> where is it called -> after vertexprocessing: It is a constant direction
     isBackFace(v1, v2, v3) {
-        // TODO: check whether the triangle of three given vertices is a
+        // DONE: check whether the triangle of three given vertices is a
         // backface or not.
         // Backface culling can be easily implemented by calculating the dot product*
         // of face normal and camera look at direction.assumed to be unit vectors
+        // calculate the 2 vectors
         const u = v2.sub(v1);
         const v = v3.sub(v1);
-        // Nx = UyVz - UzVy
-        // Ny = UzVx - UxVz
-        // Nz = UxVy - UyVx
-        const nx = u.y * v.z - u.z * v.y;
-        const ny = u.z * v.x - u.x * v.z;
-        const nz = u.x * v.y - u.y * v.x;
-        const normal = new vec4_1.Vec4(nx, ny, nz, 1);
+        const normalVector = u.cross(v).unit();
+        // assuming looking at -z
+        const lookAtDirection = new vec4_1.Vec4(0, 0, -1, 0);
+        // calc dot product of normal, lookAt
+        const dotProd = normalVector.dot(lookAtDirection);
+        if (dotProd >= 0) {
+            return true;
+        }
         return false;
     }
     /**
@@ -172,14 +179,17 @@ class Rasterizer {
      * otherwise.
      */
     isInViewport(v1, v2, v3) {
-        // TODO: implement view frustum culling assertion, test if a given
+        // DONE: implement view frustum culling assertion, test if a given
         // triangle is inside the screen space [0, width] x [0, height] or not.
         //
         // Hint: one can test if the AABB of the given triangle intersects
         // with the AABB of the viewport space.
-        const viewportMatrix = this.viewportMatrix();
+        // return true;
         const aabbVector = new aabb_1.AABB(v1, v2, v3);
-        const aabbViewport = new aabb_1.AABB(v1, v2, v3);
+        const aabbViewport = new aabb_1.AABB(new vec4_1.Vec4(0, 0, 0, 1), new vec4_1.Vec4(this.width, this.height, 0, 1), new vec4_1.Vec4(0, 0, 0, 1));
+        if (aabbVector.intersect(aabbViewport)) {
+            return true;
+        }
         return false;
     }
     /**
@@ -265,7 +275,7 @@ class Rasterizer {
      * @param value is the new value to be stored in the buffer.
      */
     updateBuffer(buf, i, j, value) {
-        // TODO: implement the buffer update, update the corresponding values
+        // DONE: implement the buffer update, update the corresponding values
         // in the given buffer by the given value. Any invalid inputs (such
         // as updating index outside the buffer range) should be discarded
         // directly without bothring the buffer.
