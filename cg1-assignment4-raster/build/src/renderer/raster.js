@@ -127,17 +127,13 @@ class Rasterizer {
         const modelMatrix = uniforms.get("modelMatrix");
         const viewMatrix = uniforms.get("viewMatrix");
         const vpMatrix = uniforms.get("vpMatrix");
-        let transformationMatrix = modelMatrix;
-        transformationMatrix.mulM(viewMatrix);
-        transformationMatrix.mulM(projMatrix);
-        transformationMatrix.mulM(vpMatrix);
-        // mat4 MV = V * M;
-        // mat4 MVP = P * MV;
-        // vec4 v1 = MVP * v;
-        //let modelViewMatrix = viewMatrix.mulM(modelMatrix)
-        // const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new Vec4(v.position.x, v.position.y, v.position.z, 1)) 
-        return new mesh_1.Vert(v.position.apply(transformationMatrix), v.normal, v.uv);
-        // return new Vert(new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0));
+        let vert = v.position;
+        vert = vert.apply(modelMatrix);
+        vert = vert.apply(viewMatrix);
+        vert = vert.apply(projMatrix);
+        vert = vert.scale(1 / vert.w);
+        vert = vert.apply(vpMatrix);
+        return new mesh_1.Vert(vert, v.normal, v.uv);
     }
     /**
      * isBackFace checks if a given triangle is a back face or not. If the
@@ -156,11 +152,13 @@ class Rasterizer {
         // Backface culling can be easily implemented by calculating the dot product*
         // of face normal and camera look at direction.assumed to be unit vectors
         // calculate the 2 vectors
-        const u = v2.sub(v1);
-        const v = v3.sub(v1);
-        const normalVector = u.cross(v).unit();
+        const u = v1.sub(v2);
+        const v = v3.sub(v2);
+        let normalVector = v.cross(u);
+        normalVector.unit();
         // assuming looking at -z
         const lookAtDirection = new vec4_1.Vec4(0, 0, -1, 0);
+        lookAtDirection.unit();
         // calc dot product of normal, lookAt
         const dotProd = normalVector.dot(lookAtDirection);
         if (dotProd >= 0) {
@@ -186,7 +184,7 @@ class Rasterizer {
         // with the AABB of the viewport space.
         // return true;
         const aabbVector = new aabb_1.AABB(v1, v2, v3);
-        const aabbViewport = new aabb_1.AABB(new vec4_1.Vec4(0, 0, 0, 1), new vec4_1.Vec4(this.width, this.height, 0, 1), new vec4_1.Vec4(0, 0, 0, 1));
+        const aabbViewport = new aabb_1.AABB(new vec4_1.Vec4(this.width, this.height, -1, 1), new vec4_1.Vec4(0, 0, 0, 1), new vec4_1.Vec4(0, 0, 0, 1));
         if (aabbVector.intersect(aabbViewport)) {
             return true;
         }

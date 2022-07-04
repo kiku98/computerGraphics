@@ -147,22 +147,16 @@ export class Rasterizer {
     const viewMatrix = uniforms.get("viewMatrix") as Mat4;
     const vpMatrix = uniforms.get("vpMatrix") as Mat4;
 
-    let transformationMatrix = modelMatrix
-    transformationMatrix.mulM(viewMatrix)
-    transformationMatrix.mulM(projMatrix)
-    transformationMatrix.mulM(vpMatrix)
-
-    // mat4 MV = V * M;
-    // mat4 MVP = P * MV;
-    // vec4 v1 = MVP * v;
-
-    //let modelViewMatrix = viewMatrix.mulM(modelMatrix)
     
-
-    // const gl_Position = (projMatrix.mulM(viewMatrix.mulM(modelMatrix))).mulV(new Vec4(v.position.x, v.position.y, v.position.z, 1)) 
+    let vert = v.position;
+    vert = vert.apply(modelMatrix);
+    vert = vert.apply(viewMatrix);
+    vert = vert.apply(projMatrix);
+    vert = vert.scale(1 / vert.w);
+    vert = vert.apply(vpMatrix);
     
-    return new Vert(v.position.apply(transformationMatrix), v.normal, v.uv);
-    // return new Vert(new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0), new Vec4(0, 0, 0, 0));
+    return new Vert(vert, v.normal, v.uv);
+
   }
 
   /**
@@ -183,13 +177,15 @@ export class Rasterizer {
     // of face normal and camera look at direction.assumed to be unit vectors
 
     // calculate the 2 vectors
-    const u = v2.sub(v1)
-    const v = v3.sub(v1)
+    const u = v1.sub(v2)
+    const v = v3.sub(v2)
     
-    const normalVector = u.cross(v).unit()
+    let normalVector = v.cross(u)
+    normalVector.unit()
 
     // assuming looking at -z
     const lookAtDirection = new Vec4(0,0,-1,0)
+    lookAtDirection.unit()
     
     // calc dot product of normal, lookAt
     const dotProd = normalVector.dot(lookAtDirection)
@@ -220,7 +216,7 @@ export class Rasterizer {
     // return true;
 
     const aabbVector = new AABB(v1,v2,v3)
-    const aabbViewport = new AABB(new Vec4(0,0,0,1), new Vec4(this.width,this.height,0,1), new Vec4(0,0,0,1))
+    const aabbViewport = new AABB(new Vec4(this.width,this.height,-1,1), new Vec4(0,0,0,1), new Vec4(0,0,0,1))
     if(aabbVector.intersect(aabbViewport)){
       return true;
     }
@@ -279,23 +275,32 @@ export class Rasterizer {
     // const triangle = new Triangle(new Vector3(v1.x, v1.y, v1.z), new Vector3(v2.x, v2.y, v2.z),new Vector3(v3.x, v3.x, v3.z))
     // triangle.containsPoint(new Vector3(p.x, p.y, p.z))
 
-    function sameSide(p1:Vec4, p2:Vec4, a:Vec4, b: Vec4): boolean{
-      const cp1 = (b.sub(a)).cross(p1.sub(a))
-      const cp2 = (b.sub(a)).cross(p2.sub(a))
-      if (cp1.dot(cp2)>=0) {
-        return true
-      }
-      else{
-        return false
-      }
-    }
-    if (sameSide(p, v1, v2, v3) && sameSide(p,v2,v1,v3) && sameSide(p,v3,v1,v2)){
+    // function sameSide(p1:Vec4, p2:Vec4, a:Vec4, b: Vec4): boolean{
+    //   const cp1 = (b.sub(a)).cross(p1.sub(a))
+    //   const cp2 = (b.sub(a)).cross(p2.sub(a))
+    //   if (cp1.dot(cp2)>=0) {
+    //     return true
+    //   }
+    //   else{
+    //     return false
+    //   }
+    // }
+    // if (sameSide(p, v1, v2, v3) && sameSide(p,v2,v1,v3) && sameSide(p,v3,v2,v1)){
+    //   return true
+    // }
+    // else{
+    //   return false
+    // }
+
+    if (
+      (((v1.sub(v2)).cross(v1.sub(p))).dot(new Vec4(0,0,1,0)) >= 0)&&
+      (((v2.sub(v3)).cross(v2.sub(p))).dot(new Vec4(0,0,1,0)) >= 0)&&
+      ((v3.sub(v1)).cross(v3.sub(p))).dot(new Vec4(0,0,1,0)) >= 0 
+      ){
       return true
     }
-    else{
-      return false
-    }
-
+    return false
+    
   }
   /**
    * drawPixel draws a pixel by its given position (x, y), the drawing
