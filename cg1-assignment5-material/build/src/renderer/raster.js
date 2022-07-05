@@ -47,8 +47,9 @@ class Rasterizer {
      * @returns a depth buffer that stores a black color in all pixels.
      */
     initDepthBuffer() {
-        // TODO: Initialize the depth buffer using an appropriate value.
-        return new Array(0);
+        // DONE: Initialize the depth buffer using an appropriate value.
+        return new Array(this.width * this.height).fill(-1);
+        ;
     }
     /**
      * render computes one rendering pass and returns a rendered frame
@@ -225,7 +226,11 @@ class Rasterizer {
     passDepthTest(depthBuf, x, y, z) {
         // TODO: Compare and return true if a depth value is greater than the
         // existing depth value in the depth buffer or not otherwise.
-        return true;
+        const actualDepth = depthBuf[y * this.width + x];
+        if (z > actualDepth) {
+            return true;
+        }
+        return false;
     }
     /**
      * computeMipmapLevel computes the estimated mipmap level to query the

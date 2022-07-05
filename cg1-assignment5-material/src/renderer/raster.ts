@@ -55,8 +55,8 @@ export class Rasterizer {
    * @returns a depth buffer that stores a black color in all pixels.
    */
   initDepthBuffer(): Array<number> {
-    // TODO: Initialize the depth buffer using an appropriate value.
-    return new Array<number>(0);
+    // DONE: Initialize the depth buffer using an appropriate value.
+    return new Array<number>(this.width * this.height).fill(-1);;
   }
 
   /**
@@ -279,6 +279,8 @@ export class Rasterizer {
     // the barycentric coordinates is typed using Vec4 but the
     // corresponding w component can either be 1 or 0 (does not matter
     // in this case because it is neither a position nor a Vec4).
+    
+    //const totalSpace = 
     return new Vec4(0, 0, 0, 1);
   }
   /**
@@ -318,9 +320,13 @@ export class Rasterizer {
     y: number,
     z: number
   ): boolean {
-    // TODO: Compare and return true if a depth value is greater than the
+    // DONE: Compare and return true if a depth value is greater than the
     // existing depth value in the depth buffer or not otherwise.
-    return true;
+    const actualDepth = depthBuf[y*this.width+x]
+    if(z>actualDepth){
+      return true;
+    }
+    return false;
   }
   /**
    * computeMipmapLevel computes the estimated mipmap level to query the
