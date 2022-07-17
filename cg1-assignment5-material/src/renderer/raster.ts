@@ -366,7 +366,8 @@ export class Rasterizer {
    */
   computeMipmapLevel(size: number, uv: Vec4, dU: Vec4, dV: Vec4): number {
     // TODO: Compute the estimated mipmap level using given parameters.
-    return 0;
+    const max = Math.max(uv.sub(dU).len(), uv.sub(dV).len());
+    return Math.log2(max * size);
   }
   /**
    * isBackFace checks if a given triangle is a back face or not. If the

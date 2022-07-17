@@ -20,7 +20,7 @@ export function Lerp(from: number, to: number, t: number): number {
   //
   // For instance, if from === 0, to === 1, then it should return 0.3
   // if t === 0.3.
-  return 0;
+  return (to - from) * t;
 }
 
 /**
@@ -34,5 +34,10 @@ export function LerpV(from: Vec4, to: Vec4, t: number): Vec4 {
   // TODO: Implement linear interpolation between two Vec4s.
   //
   // All components should be interpolated linearly using t.
-  return new Vec4(0, 0, 0, 0);
+  return new Vec4(
+    Lerp(to.x, from.x, t),
+    Lerp(to.y, from.y, t),
+    Lerp(to.z, from.z, t),
+    from.w
+  );
 }

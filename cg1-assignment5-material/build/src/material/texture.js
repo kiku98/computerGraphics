@@ -94,6 +94,8 @@ class Texture {
         }
         const mipmap = new Array(L);
         mipmap[0] = data;
+        console.log(L);
+        console.log(mipmap);
         // TODO: create MIP maps and store them into the allocated mipmap
         // array, then return the mipmap array when the scaling is finished.
         //
@@ -101,6 +103,13 @@ class Texture {
         // scaling operation (recommended) or implement a helper function
         // that does the scaling. Note that a higher level of mipmap
         // contains a smaller size of the texture.
+        console.log(scaleDown2x(Math.sqrt(mipmap[0].length), Math.sqrt(mipmap[0].length), data));
+        console.log(mipmap[0].length);
+        for (let index = 0; index < L - 1; index++) {
+            console.log(scaleDown2x(Math.sqrt(mipmap[index].length), Math.sqrt(mipmap[index].length), data));
+            mipmap[index + 1] = scaleDown2x(Math.sqrt(mipmap[index].length), Math.sqrt(mipmap[index].length), data);
+        }
+        console.log(mipmap);
         return mipmap;
     }
     /**

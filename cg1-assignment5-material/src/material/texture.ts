@@ -110,6 +110,8 @@ export class Texture {
 
     const mipmap = new Array<Array<Vec4>>(L);
     mipmap[0] = data;
+    console.log(L);
+    console.log(mipmap);
 
     // TODO: create MIP maps and store them into the allocated mipmap
     // array, then return the mipmap array when the scaling is finished.
@@ -118,6 +120,13 @@ export class Texture {
     // scaling operation (recommended) or implement a helper function
     // that does the scaling. Note that a higher level of mipmap
     // contains a smaller size of the texture.
+    for (let index = 0; index < L - 1; index++) {
+      mipmap[index + 1] = scaleDown2x(
+        Math.sqrt(mipmap[index].length),
+        Math.sqrt(mipmap[index].length),
+        data
+      );
+    }
     return mipmap;
   }
   /**
