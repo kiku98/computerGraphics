@@ -349,6 +349,9 @@ class Rasterizer {
     drawWireframe(frameBuf, depthBuf, v1, v2, v3, color) {
         // TODO: Draw the wireframe of the triangle. One can draw three
         // lines from one vertex to the other, but order matters.
+        this.drawLine(frameBuf, depthBuf, v1, v2, color);
+        this.drawLine(frameBuf, depthBuf, v2, v3, color);
+        this.drawLine(frameBuf, depthBuf, v3, v1, color);
     }
     /**
      * drawLine implements the Bresenham algorithm that draws a line
