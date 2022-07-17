@@ -329,7 +329,7 @@ export class Rasterizer {
     // and return the computed value. The interpolation only requires
     // the xyz component of the bc Vec4 and the w component is *not*
     // used here.
-    return 0;
+    return bc.x * v1 + bc.y * v2 + bc.z * v3;
   }
   /**
    * passDepthTest conducts a depth test.

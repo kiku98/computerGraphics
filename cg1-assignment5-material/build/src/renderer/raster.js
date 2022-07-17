@@ -198,7 +198,6 @@ class Rasterizer {
         const v1Zero = new vec4_1.Vec4(v1.x, v1.y, 0, 1);
         const v2Zero = new vec4_1.Vec4(v2.x, v2.y, 0, 1);
         const v3Zero = new vec4_1.Vec4(v3.x, v3.y, 0, 1);
-        //const fN = v2.sub(v1).cross(v3.sub(v1));
         const totalSpace = 0.5 * v1Zero.sub(v2Zero).cross(v1Zero.sub(v3Zero)).len();
         const w1Normal = p.sub(v2Zero).cross(p.sub(v3Zero));
         const w2Normal = p.sub(v1Zero).cross(p.sub(v3Zero));
@@ -206,19 +205,18 @@ class Rasterizer {
         let w1 = 0.5 * w1Normal.len();
         let w2 = 0.5 * w2Normal.len();
         let w3 = 0.5 * w3Normal.len();
-        if (v2Zero.sub(v1Zero).cross(p.sub(v1Zero)).z < 0) {
-            console.log('AB');
-            w3 = -w3;
-        }
         if (v3Zero.sub(v2Zero).cross(p.sub(v2Zero)).z < 0) {
-            console.log('BC');
+            // console.log('BC');
             w1 = -w1;
         }
         if (v1Zero.sub(v3Zero).cross(p.sub(v3Zero)).z < 0) {
-            console.log('CA');
+            //console.log('CA');
             w2 = -w2;
         }
-        // console.log(new Vec4(w1 / totalSpace, w2 / totalSpace, w3 / totalSpace, 1));
+        if (v2Zero.sub(v1Zero).cross(p.sub(v1Zero)).z < 0) {
+            // console.log('AB');
+            w3 = -w3;
+        }
         return new vec4_1.Vec4(w1 / totalSpace, w2 / totalSpace, w3 / totalSpace, 1);
     }
     /**
@@ -236,7 +234,7 @@ class Rasterizer {
         // and return the computed value. The interpolation only requires
         // the xyz component of the bc Vec4 and the w component is *not*
         // used here.
-        return 0;
+        return bc.x * v1 + bc.y * v2 + bc.z * v3;
     }
     /**
      * passDepthTest conducts a depth test.
