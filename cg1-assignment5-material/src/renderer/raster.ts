@@ -56,7 +56,7 @@ export class Rasterizer {
    */
   initDepthBuffer(): Array<number> {
     // DONE: Initialize the depth buffer using an appropriate value.
-    return new Array<number>(this.width * this.height).fill(-1);;
+    return new Array<number>(this.width * this.height).fill(-1);
   }
 
   /**
@@ -279,9 +279,45 @@ export class Rasterizer {
     // the barycentric coordinates is typed using Vec4 but the
     // corresponding w component can either be 1 or 0 (does not matter
     // in this case because it is neither a position nor a Vec4).
-    
-    //const totalSpace = 
-    return new Vec4(0, 0, 0, 1);
+    const v1Zero = new Vec4(v1.x, v1.y, 0, 1);
+    const v2Zero = new Vec4(v2.x, v2.y, 0, 1);
+    const v3Zero = new Vec4(v3.x, v3.y, 0, 1);
+    const fN = v2.sub(v1).cross(v3.sub(v1));
+
+    const totalSpace = 0.5 * v1Zero.sub(v2Zero).cross(v1Zero.sub(v3Zero)).len();
+
+    const w1Normal = p.sub(v2Zero).cross(p.sub(v3Zero));
+    const w2Normal = p.sub(v1Zero).cross(p.sub(v3Zero));
+    const w3Normal = p.sub(v1Zero).cross(p.sub(v2Zero));
+    // console.log(fN.dot(w1Normal));
+    // console.log(fN.dot(w2Normal));
+    // console.log(fN.dot(w3Normal));
+    // console.log(fN.dot(w1Normal) / (fN.len() * w1Normal.len()));
+    // console.log(fN.dot(w2Normal) / (fN.len() * w2Normal.len()));
+    // console.log(fN.dot(w3Normal) / (fN.len() * w3Normal.len()));
+    // let w1,w2,w3;
+    // if(fN.dot(w1Normal))
+    //   w1 =
+
+    let w1 = 0.5 * w1Normal.len();
+    let w2 = 0.5 * w2Normal.len();
+    let w3 = 0.5 * w3Normal.len();
+
+    if (v2Zero.sub(v1Zero).cross(p.sub(v1Zero)).z < 0) {
+      console.log('AB');
+      w3 = -w3;
+    }
+    if (v3Zero.sub(v2Zero).cross(p.sub(v2Zero)).z < 0) {
+      console.log('BC');
+      w2 = -w2;
+    }
+    if (v1Zero.sub(v3Zero).cross(p.sub(v3Zero)).z < 0) {
+      console.log('CA');
+      w1 = -w1;
+    }
+
+    console.log(new Vec4(w1 / totalSpace, w2 / totalSpace, w3 / totalSpace, 1));
+    return new Vec4(w1 / totalSpace, w2 / totalSpace, w3 / totalSpace, 1);
   }
   /**
    * barycentricInterpolation implements the barycentric interpolation for
@@ -322,8 +358,8 @@ export class Rasterizer {
   ): boolean {
     // DONE: Compare and return true if a depth value is greater than the
     // existing depth value in the depth buffer or not otherwise.
-    const actualDepth = depthBuf[y*this.width+x]
-    if(z>actualDepth){
+    const actualDepth = depthBuf[y * this.width + x];
+    if (z > actualDepth) {
       return true;
     }
     return false;
@@ -387,16 +423,21 @@ export class Rasterizer {
     const AB = new Vec4(v2.x, v2.y, 0, 1).sub(new Vec4(v1.x, v1.y, 0, 1));
     const AP = p.sub(new Vec4(v1.x, v1.y, 0, 1));
     if (AB.cross(AP).z < 0) {
+      console.log('AB');
       return false;
     }
     const BC = new Vec4(v3.x, v3.y, 0, 1).sub(new Vec4(v2.x, v2.y, 0, 1));
     const BP = p.sub(new Vec4(v2.x, v2.y, 0, 1));
     if (BC.cross(BP).z < 0) {
+      console.log('BC');
+
       return false;
     }
     const CA = new Vec4(v1.x, v1.y, 0, 1).sub(new Vec4(v3.x, v3.y, 0, 1));
     const CP = p.sub(new Vec4(v3.x, v3.y, 0, 1));
     if (CA.cross(CP).z < 0) {
+      console.log('CA');
+
       return false;
     }
     return true;
