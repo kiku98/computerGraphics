@@ -110,8 +110,6 @@ export class Texture {
 
     const mipmap = new Array<Array<Vec4>>(L);
     mipmap[0] = data;
-    console.log(L);
-    console.log(mipmap);
 
     // TODO: create MIP maps and store them into the allocated mipmap
     // array, then return the mipmap array when the scaling is finished.
@@ -221,7 +219,9 @@ export class Texture {
     // lerp(c1, c2, t).
     //
     // Hint: To interpolate two colors, one can use LerpV.
-    return LerpV(new Vec4(0, 0, 0, 1), new Vec4(0, 0, 0, 1), t);
+    const higher = this.queryBilinear(h, u, v);
+    const lower = this.queryBilinear(l, u, v);
+    return LerpV(higher, lower, t);
   }
   /**
    * queryBilinear interpolates and queries the texture color at position
@@ -243,6 +243,18 @@ export class Texture {
    * @returns the bilinearly interpolated color at (x, y).
    */
   queryBilinear(lod: number, x: number, y: number): Vec4 {
+    //console.log(lod);
+    if (this.color(this.mipmap[1], 1024, x, y)) {
+      console.log(this.color(this.mipmap[0], 1024, x, y));
+    }
+    return LerpV(new Vec4(0, 0, 0, 1), new Vec4(0, 0, 0, 1), 0);
+    // Checke Level, nehme entsprechendes MipMap Array,
+    // nehme 4 farben
+    // interpoliere sie doppelt
+    // fehlerhandling
+    // wenn 1x1 mip map: return direkt
+    //
+
     // TODO: Interpolate and query the color at position (x, y).
     //
     // To interpolate a color at (x, y), we can query four colors at the
@@ -283,7 +295,7 @@ export class Texture {
     //
     // The simple case: if the lod is the final level of the mipmap (1x1),
     // we can return the color directly.
-    return LerpV(new Vec4(0, 0, 0, 1), new Vec4(0, 0, 0, 1), 0);
+    //
   }
   /**
    * color fetches the color of a given texture color buffer at (i, j).

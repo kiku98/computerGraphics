@@ -414,20 +414,20 @@ export class Rasterizer {
     const AB = new Vec4(v2.x, v2.y, 0, 1).sub(new Vec4(v1.x, v1.y, 0, 1));
     const AP = p.sub(new Vec4(v1.x, v1.y, 0, 1));
     if (AB.cross(AP).z < 0) {
-      console.log('AB');
+      // console.log('AB');
       return false;
     }
     const BC = new Vec4(v3.x, v3.y, 0, 1).sub(new Vec4(v2.x, v2.y, 0, 1));
     const BP = p.sub(new Vec4(v2.x, v2.y, 0, 1));
     if (BC.cross(BP).z < 0) {
-      console.log('BC');
+      // console.log('BC');
 
       return false;
     }
     const CA = new Vec4(v1.x, v1.y, 0, 1).sub(new Vec4(v3.x, v3.y, 0, 1));
     const CP = p.sub(new Vec4(v3.x, v3.y, 0, 1));
     if (CA.cross(CP).z < 0) {
-      console.log('CA');
+      // console.log('CA');
 
       return false;
     }
