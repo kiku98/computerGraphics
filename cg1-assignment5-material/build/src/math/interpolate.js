@@ -21,7 +21,7 @@ function Lerp(from, to, t) {
     //
     // For instance, if from === 0, to === 1, then it should return 0.3
     // if t === 0.3.
-    return (to - from) * t;
+    return from + (to - from) * t;
 }
 exports.Lerp = Lerp;
 /**
@@ -35,7 +35,7 @@ function LerpV(from, to, t) {
     // TODO: Implement linear interpolation between two Vec4s.
     //
     // All components should be interpolated linearly using t.
-    return new vec4_1.Vec4(Lerp(to.x, from.x, t), Lerp(to.y, from.y, t), Lerp(to.z, from.z, t), from.w);
+    return new vec4_1.Vec4(Lerp(from.x, to.x, t), Lerp(from.y, to.y, t), Lerp(from.z, to.z, t), from.w);
 }
 exports.LerpV = LerpV;
 //# sourceMappingURL=interpolate.js.map

@@ -245,6 +245,7 @@ export class Texture {
   queryBilinear(lod: number, x: number, y: number): Vec4 {
     //console.log(lod);
     if (this.color(this.mipmap[1], 1024, x, y)) {
+      //query!!!
       console.log(this.color(this.mipmap[0], 1024, x, y));
     }
     return LerpV(new Vec4(0, 0, 0, 1), new Vec4(0, 0, 0, 1), 0);
