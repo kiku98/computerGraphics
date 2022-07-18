@@ -271,7 +271,7 @@ export class Rasterizer {
    * @returns the barycentric coordinates
    */
   computeBarycentric(p: Vec4, v1: Vec4, v2: Vec4, v3: Vec4): Vec4 {
-    // TODO: Compute the barycentric coordinates for p. The Vec4s
+    // DONE: Compute the barycentric coordinates for p. The Vec4s
     // v1, v2, and v3 represent a triangle. Note that barycentric
     // coordinates are computed in a 2D space, thus conceptually,
     // the computation only needs to utilize the x-y coordinates and
@@ -325,7 +325,7 @@ export class Rasterizer {
     v2: number,
     v3: number
   ): number {
-    // TODO: Interpolate v1,v2,v3 using barycentric coordinates (bc),
+    // DONE: Interpolate v1,v2,v3 using barycentric coordinates (bc),
     // and return the computed value. The interpolation only requires
     // the xyz component of the bc Vec4 and the w component is *not*
     // used here.
@@ -365,7 +365,7 @@ export class Rasterizer {
    * @returns
    */
   computeMipmapLevel(size: number, uv: Vec4, dU: Vec4, dV: Vec4): number {
-    // TODO: Compute the estimated mipmap level using given parameters.
+    // DONE: Compute the estimated mipmap level using given parameters.
     const max = Math.max(uv.sub(dU).len(), uv.sub(dV).len());
     return Math.log2(max * size);
   }

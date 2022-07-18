@@ -111,7 +111,7 @@ export class Texture {
     const mipmap = new Array<Array<Vec4>>(L);
     mipmap[0] = data;
 
-    // TODO: create MIP maps and store them into the allocated mipmap
+    // DONE: create MIP maps and store them into the allocated mipmap
     // array, then return the mipmap array when the scaling is finished.
     //
     // We can use the scaleDown2x function on the top of the file for
@@ -243,12 +243,54 @@ export class Texture {
    * @returns the bilinearly interpolated color at (x, y).
    */
   queryBilinear(lod: number, x: number, y: number): Vec4 {
-    //console.log(lod);
-    if (this.color(this.mipmap[1], 1024, x, y)) {
-      //query!!!
-      console.log(this.color(this.mipmap[0], 1024, x, y));
+    if (lod > 0) {
+      const realCoordinateX = x * (this.size / Math.pow(2, lod - 1));
+      const xBottom = Math.floor(realCoordinateX);
+      const xTop = Math.floor(realCoordinateX) + 1;
+      const interpolationTX = realCoordinateX - xBottom;
+
+      const realCoordinateY = y * (this.size / Math.pow(2, lod - 1));
+      const yBottom = Math.floor(realCoordinateY);
+      const yTop = Math.floor(realCoordinateY) + 1;
+      const interpolationTY = realCoordinateY - yBottom;
+
+      const color1 = this.color(
+        this.mipmap[lod - 1],
+        this.size / Math.pow(2, lod - 1),
+        xBottom,
+        yBottom
+      );
+      const color2 = this.color(
+        this.mipmap[lod - 1],
+        this.size / Math.pow(2, lod - 1),
+        xTop,
+        yBottom
+      );
+      const color3 = this.color(
+        this.mipmap[lod - 1],
+        this.size / Math.pow(2, lod - 1),
+        xBottom,
+        yTop
+      );
+      const color4 = this.color(
+        this.mipmap[lod - 1],
+        this.size / Math.pow(2, lod - 1),
+        xTop,
+        yTop
+      );
+
+      const firstInterpol = LerpV(color1, color2, interpolationTX);
+      const secondInterpol = LerpV(color3, color4, interpolationTX);
+      const thirdInterpol = LerpV(
+        firstInterpol,
+        secondInterpol,
+        interpolationTY
+      );
+      return thirdInterpol;
+    } else {
+      return this.query(x, y);
     }
-    return LerpV(new Vec4(0, 0, 0, 1), new Vec4(0, 0, 0, 1), 0);
+
     // Checke Level, nehme entsprechendes MipMap Array,
     // nehme 4 farben
     // interpoliere sie doppelt

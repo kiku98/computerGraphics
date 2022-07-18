@@ -219,9 +219,11 @@ class Texture {
      */
     queryBilinear(lod, x, y) {
         //console.log(lod);
+        //console.log(this.mipmap[0]);
+        console.log(this.queryNaive(Math.pow(x, lod), Math.pow(y, lod)));
         if (this.color(this.mipmap[1], 1024, x, y)) {
             //query!!!
-            console.log(this.color(this.mipmap[0], 1024, x, y));
+            //console.log(this.color(this.mipmap[0], 1024, x, y));
         }
         return (0, interpolate_1.LerpV)(new vec4_1.Vec4(0, 0, 0, 1), new vec4_1.Vec4(0, 0, 0, 1), 0);
         // Checke Level, nehme entsprechendes MipMap Array,
