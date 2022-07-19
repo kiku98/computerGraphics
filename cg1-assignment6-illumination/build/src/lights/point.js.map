@@ -1,0 +1,1 @@
+{"version":3,"file":"point.js","sourceRoot":"","sources":["../../../src/lights/point.ts"],"names":[],"mappings":";AAAA;;;;;;GAMG;;;AAEH,uCAAkC;AAElC;;GAEG;AACH,MAAa,UAAU;IAIrB;;;;OAIG;IACH,YAAY,GAAS,EAAE,KAAK,GAAG,IAAI,WAAI,CAAC,GAAG,EAAE,GAAG,EAAE,GAAG,EAAE,CAAC,CAAC;QACvD,IAAI,CAAC,QAAQ,GAAG,GAAG,CAAC;QACpB,IAAI,CAAC,KAAK,GAAG,KAAK,CAAC;IACrB,CAAC;CACF;AAbD,gCAaC"}

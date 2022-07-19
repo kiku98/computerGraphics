@@ -1,0 +1,1 @@
+{"version":3,"file":"scene.js","sourceRoot":"","sources":["../../../src/renderer/scene.ts"],"names":[],"mappings":";AAAA;;;;;;GAMG;;;AAMH;;GAEG;AACH,MAAa,KAAK;IAKhB;;;;;;;OAOG;IACH,YAAY,MAAc,EAAE,KAAiB,EAAE,MAAe;QAC5D,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;QACrB,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;QACrB,IAAI,CAAC,KAAK,GAAG,KAAK,CAAC;IACrB,CAAC;CACF;AAlBD,sBAkBC"}
