@@ -102,7 +102,8 @@ class Mesh extends object_1.Object3D {
         //
         // Hint: we can use the methods that were implemented in the
         // assignment 1 (check math/mat4.ts).
-        return this.modelMatrix();
+        const modelMatrix = this.modelMatrix();
+        return modelMatrix.inv().T();
     }
     /**
      * useMaterial uses the given material as the rendering material of

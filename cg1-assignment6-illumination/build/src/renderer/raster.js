@@ -14,6 +14,7 @@ const mesh_1 = require("../geometry/mesh");
 const utils_1 = require("../math/utils");
 const interpolate_1 = require("../math/interpolate");
 const vec4_1 = require("../math/vec4");
+const texture_1 = require("../material/texture");
 /**
  * Rasterizer is a CPU rasterizer.
  */
@@ -98,7 +99,14 @@ class Rasterizer {
         // to scale image down step by step.
         //
         // The this.msaa can only be 1, 2, 4, ... power of two.
-        return frameBuf;
+        const factor = Math.log2(this.msaa);
+        let frameBufferReduced = frameBuf;
+        console.log(factor);
+        for (let index = 0; index < factor; index++) {
+            frameBufferReduced = (0, texture_1.scaleDown2x)(this.width / Math.pow(2, index), this.height / Math.pow(2, index), frameBufferReduced);
+            console.log(frameBufferReduced);
+        }
+        return frameBufferReduced;
     }
     /**
      * vertexShader is a shader that applies on a given vertex and outputs
@@ -229,8 +237,7 @@ class Rasterizer {
         const La = this.La(matopts);
         const Ld = this.Ld(matopts, normal, L);
         const Ls = this.Ls(matopts, normal, H);
-        // TODO: Compute the blinn-phong shading value.
-        return 0;
+        return La + Ld + Ls;
     }
     /**
      * lightDir calculates the unit light direction.
@@ -241,7 +248,7 @@ class Rasterizer {
      */
     lightDir(x, light) {
         // TODO: return light direction
-        return x;
+        return light.position.sub(x).unit();
     }
     /**
      * viewDir returns the view direction (from shading point to camera)
@@ -252,7 +259,7 @@ class Rasterizer {
      */
     viewDir(x, camera) {
         // TODO: return view direction
-        return x;
+        return camera.position.sub(x).unit();
     }
     /**
      * halfVector returns the half vector.
@@ -263,7 +270,7 @@ class Rasterizer {
      */
     halfVector(L, V) {
         // TODO: return half-vector
-        return L;
+        return V.add(L).unit();
     }
     /**
      * La returns ambient term of the Blinn-Phong reflectance model
@@ -272,7 +279,7 @@ class Rasterizer {
      */
     La(matopts) {
         // TODO: return ambient term
-        return 0;
+        return matopts.Kamb;
     }
     /**
      * Ld returns diffuse term of the Blinn-Phong reflectance model
@@ -284,7 +291,7 @@ class Rasterizer {
      */
     Ld(matopts, normal, L) {
         // TODO: return diffuse term
-        return 0;
+        return matopts.Kdiff * Math.max(0, normal.dot(L));
     }
     /**
      * Ls returns specular term of the Blinn-Phong reflectance model
@@ -296,7 +303,7 @@ class Rasterizer {
      */
     Ls(matopts, normal, H) {
         // TODO: return specular term
-        return 0;
+        return (matopts.Kspec * Math.pow(Math.max(0, normal.dot(H)), matopts.shininess));
     }
     /**
      * computeBarycentric computes the barycentric coordinates for

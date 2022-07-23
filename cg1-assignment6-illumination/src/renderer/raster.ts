@@ -125,7 +125,16 @@ export class Rasterizer {
     // to scale image down step by step.
     //
     // The this.msaa can only be 1, 2, 4, ... power of two.
-    return frameBuf;
+    const factor = Math.log2(this.msaa);
+    let frameBufferReduced = frameBuf;
+    for (let index = 0; index < factor; index++) {
+      frameBufferReduced = scaleDown2x(
+        this.width / Math.pow(2, index),
+        this.height / Math.pow(2, index),
+        frameBufferReduced
+      );
+    }
+    return frameBufferReduced;
   }
   /**
    * vertexShader is a shader that applies on a given vertex and outputs
@@ -355,8 +364,7 @@ export class Rasterizer {
     const Ld = this.Ld(matopts, normal, L);
     const Ls = this.Ls(matopts, normal, H);
 
-    // TODO: Compute the blinn-phong shading value.
-    return 0;
+    return La + Ld + Ls;
   }
   /**
    * lightDir calculates the unit light direction.
@@ -367,7 +375,7 @@ export class Rasterizer {
    */
   lightDir(x: Vec4, light: PointLight): Vec4 {
     // TODO: return light direction
-    return x;
+    return light.position.sub(x).unit();
   }
   /**
    * viewDir returns the view direction (from shading point to camera)
@@ -378,7 +386,7 @@ export class Rasterizer {
    */
   viewDir(x: Vec4, camera: ICamera): Vec4 {
     // TODO: return view direction
-    return x;
+    return camera.position.sub(x).unit();
   }
   /**
    * halfVector returns the half vector.
@@ -389,7 +397,7 @@ export class Rasterizer {
    */
   halfVector(L: Vec4, V: Vec4): Vec4 {
     // TODO: return half-vector
-    return L;
+    return V.add(L).unit();
   }
   /**
    * La returns ambient term of the Blinn-Phong reflectance model
@@ -398,7 +406,7 @@ export class Rasterizer {
    */
   La(matopts: MaterialOptions): number {
     // TODO: return ambient term
-    return 0;
+    return matopts.Kamb;
   }
   /**
    * Ld returns diffuse term of the Blinn-Phong reflectance model
@@ -410,7 +418,7 @@ export class Rasterizer {
    */
   Ld(matopts: MaterialOptions, normal: Vec4, L: Vec4): number {
     // TODO: return diffuse term
-    return 0;
+    return matopts.Kdiff * Math.max(0, normal.dot(L));
   }
   /**
    * Ls returns specular term of the Blinn-Phong reflectance model
@@ -422,7 +430,9 @@ export class Rasterizer {
    */
   Ls(matopts: MaterialOptions, normal: Vec4, H: Vec4): number {
     // TODO: return specular term
-    return 0;
+    return (
+      matopts.Kspec * Math.pow(Math.max(0, normal.dot(H)), matopts.shininess)
+    );
   }
   /**
    * computeBarycentric computes the barycentric coordinates for
